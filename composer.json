@@ -2,12 +2,7 @@
     "name": "koehl/magmacore",
     "description": "Simple PHP framework for building web applications",
     "type": "library",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Koehl\\Magmacore\\": "src/"
-        }
-    },
+    "license": "MIT",    
     "authors": [
         {
             "name": "KBraunVamp",
@@ -15,5 +10,23 @@
         }
     ],
     "minimum-stability": "alpha",
-    "require": {}
+    "require": {
+        "php": "7.4.19|^8.0",
+        "ext-mbstring": "*",
+        "ext-iconv": "*",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-simplexml": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magma\\": "src/Magma"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Magma\\Tests\\": "tests"
+        }
+    }
 }
