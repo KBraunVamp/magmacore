@@ -1,0 +1,19 @@
+{
+    "name": "koehl/magmacore",
+    "description": "Simple PHP framework for building web applications",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Koehl\\Magmacore\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "KBraunVamp",
+            "email": "kalinbraunvamp@gmail.com"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {}
+}
