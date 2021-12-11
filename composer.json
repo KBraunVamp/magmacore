@@ -4,6 +4,8 @@
     "keywords": ["framework", "php", "magmacore"],
     "type": "library",
     "license": "MIT",
+    "readme": "",
+    "time": "",
     "support": {
         "issues": "https://github.com/KBraunVamp/magmacore/issues",
         "source": "https://github.com/KBraunVamp/magmacore",
