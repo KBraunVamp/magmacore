@@ -24,7 +24,7 @@ class DatabaseConnection implements DatabaseConnectionInterface {
      * 
      * @return void
      */
-    public function __constructor(array $credentials) {
+    public function __construct(array $credentials) {
         $this->credentials = $credentials;
     }
 
