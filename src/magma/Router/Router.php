@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Magma\Router;
 
+use Magma\Router\Exception\RouterBadMethodCallException;
+use Magma\Router\Exception\RouterException;
 use Magma\Router\RouterInterface;
 
 class Router implements RouterInterface {
@@ -40,25 +42,25 @@ class Router implements RouterInterface {
     public function dispatch(string $url) : void {
 
         if ($this->match($url)) {
-            $controllerString = $this->params['controller'];
+            $controllerString = $this->params['controller'] . $this->controllerSuffix;
             $controllerString = $this->transformUpperCamelCase($controllerString);
-            $controllerString = $this->getNameSpace($controllerString);
+            $controllerString = $this->getNamespace($controllerString) . $controllerString;
 
             if (class_exists($controllerString)) {
-                $controllerObject = new $controllerString();
+                $controllerObject = new $controllerString($this->params);
                 $action = $this->params['action'];
                 $action = $this->transformCamelCase($action);
 
-                if (is_callable($controllerObject, $action)) {
+                if (\is_callable([$controllerObject, $action])) {
                     $controllerObject->$action();
                 } else {
-                    throw new Exception();
+                    throw new RouterBadMethodCallException();
                 }
             } else {
-                throw new Exception();
+                throw new RouterBadMethodCallException();
             }
         } else {
-            throw new Exception();
+            throw new RouterBadMethodCallException();
         }
     }
 
@@ -84,7 +86,7 @@ class Router implements RouterInterface {
     private function match(string $url) : bool {
         
         foreach ($this->routes as $route => $params) {
-            if (pre_match($route, $url, $matches)) {
+            if (preg_match($route, $url, $matches)) {
                 foreach ($matches as $key => $param) {
                     if (is_string($key)) {
                        $params[$key] = $param;

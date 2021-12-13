@@ -1,22 +1,26 @@
-<?php
+<?php 
 
-declare(strict_type=1);
+declare(strict_types=1);
 
 namespace Magma\LiquidOrm\DataMapper;
 
+//use Magma\Base\Exception\BaseInvalidArgumentException;
+//use Magma\Base\Exception\BaseNoValueException;
+//use Magma\Base\Exception\BaseException;
+use Magma\LiquidOrm\DataMapper\Exception\DataMapperException;
 use Magma\DatabaseConnection\DatabaseConnectionInterface;
+//use Magma\LiquidOrm\DataMapper\Exception\DataMapperInvalidArgumentException;
 use PDOStatement;
+use Throwable;
+use PDO;
 
-class DataMapper implements DataMapperInterface {
+class DataMapper implements DataMapperInterface
+{
 
-    /** 
-     * @var DatabaseConnectionInterface
-     */
+    /** @var DatabaseConnectionInterface */
     private DatabaseConnectionInterface $dbh;
 
-    /**
-     * @var PDOStatement
-     */
+    /** @var PDOStatement */
     private PDOStatement $statement;
 
     /**
@@ -25,7 +29,8 @@ class DataMapper implements DataMapperInterface {
      * @param DatabaseConnectionInterface
      * @return void
      */
-    public function __construct(DatabaseConnectionInterface $db) {
+    public function __construct(DatabaseConnectionInterface $dbh)
+    {
         $this->dbh = $dbh;
     }
 
@@ -37,9 +42,10 @@ class DataMapper implements DataMapperInterface {
      * @return void
      * @throws DataMapperException
      */
-    private function isEmpty($value, string $errorMessage = null) {
+    private function isEmpty($value, string $errorMessage = null)
+    {
         if (empty($value)) {
-            throw new DataMapperException($errorMessage);
+            //throw new BaseNoValueException($errorMessage);
         }
     }
 
@@ -50,17 +56,20 @@ class DataMapper implements DataMapperInterface {
      * @return void
      * @throws BaseInvalidArgumentException
      */
-    private function isArray($value) {
-        if (is_array($value)) {
-            throw new DataMapperException('Your argument needs to be an array');
+    private function isArray(array $value)
+    {
+        if (!is_array($value)) {
+            //throw new BaseInvalidArgumentException('Your argument needs to be an array');
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function prepare(string $sqlquery) : self {
-        $this->statement = $this->dbh->open()->prepare($sqlquery);
+    public function prepare(string $sqlQuery) : self
+    {
+        $this->isEmpty($sqlQuery);
+        $this->statement = $this->dbh->open()->prepare($sqlQuery);
         return $this;
     }
 
@@ -70,24 +79,23 @@ class DataMapper implements DataMapperInterface {
      * @param [type] $value
      * @return void
      */
-    public function bind($value) {
+    public function bind($value)
+    {
         try {
-            switch ($value) {
-                case is_bool($value):
-                case intval($value):    
+            switch($value) {
+                case is_bool($value) :
+                case intval($value) :
                     $dataType = PDO::PARAM_INT;
                     break;
-
-                case is_null($value):
+                case is_null($value) :
                     $dataType = PDO::PARAM_NULL;
-                    break;                   
-                
-                default:
+                    break;
+                default :
                     $dataType = PDO::PARAM_STR;
                     break;
             }
             return $dataType;
-        } catch (DataMapperException $e) {
+        } catch(Throwable $exception) {
             throw $exception;
         }
     }
@@ -99,7 +107,8 @@ class DataMapper implements DataMapperInterface {
      * @param boolean $isSearch
      * @return self
      */
-    public function bindParameters(array $fields, bool $isSearch = false) : self {
+    public function bindParameters(array $fields, bool $isSearch = false) : self
+    {
         $this->isArray($fields);
         if (is_array($fields)) {
             $type = ($isSearch === false) ? $this->bindValues($fields) : $this->bindSearchValues($fields);
@@ -118,10 +127,11 @@ class DataMapper implements DataMapperInterface {
      * @return PDOStatement
      * @throws BaseInvalidArgumentException
      */
-    protected function bindValues(array $fields) : PDOStatement {
+    protected function bindValues(array $fields) : PDOStatement
+    {
         $this->isArray($fields); // don't need
         foreach ($fields as $key => $value) {
-            $this->statement->bindValue(':' . $key, $value, $this->bind($value));
+            $this->statement->bindValue(':' . $key, $value, (int)$this->bind($value));
         }
         return $this->statement;
     }
@@ -135,10 +145,11 @@ class DataMapper implements DataMapperInterface {
      * @return mixed
      * @throws BaseInvalidArgumentException
      */
-    protected function bindSearchValues(array $fields) :  PDOStatement {
+    protected function bindSearchValues(array $fields) :  PDOStatement
+    {
         $this->isArray($fields); // don't need
         foreach ($fields as $key => $value) {
-            $this->statement->bindValue(':' . $key,  '%' . $value . '%', $this->bind($value));
+            $this->statement->bindValue(':' . $key,  '%' . $value . '%', (int)$this->bind($value));
         }
         return $this->statement;
     }
@@ -148,41 +159,45 @@ class DataMapper implements DataMapperInterface {
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         if ($this->statement) 
             return $this->statement->execute();
     }
-
     /**
      * @inheritDoc
      *
      * @return integer
      */
-    public function numRows() : int {
-        if ($this->statement) 
-
-        return $this->statement->rowCount();
+    public function numRows() : int
+    {
+        if ($this->statement) return $this->statement->rowCount();
     }
-
     /**
      * @inheritDoc
      *
      * @return Object
      */
-    public function result() : Object {
-        if ($this->statement)
-
-        return $this->statement->fetch(PDO::FETCH_OBJ);
+    public function result() : Object
+    {
+        if ($this->statement) return $this->statement->fetch(PDO::FETCH_OBJ);
     }
     /**
      * @inheritDoc
      *
      * @return array
      */
-    public function results() : array {
-        if ($this->statement) 
+    public function results() : array
+    {
+        if ($this->statement) return $this->statement->fetchAll();
+    }
 
-        return $this->statement->fetchAll();
+    /**
+     * @inheritDoc
+     */
+    public function column()
+    {
+        if ($this->statement) return $this->statement->fetchColumn();
     }
 
     /**
@@ -190,7 +205,8 @@ class DataMapper implements DataMapperInterface {
      *
      * @return integer
      */
-    public function getLastId() : int {
+    public function getLastId() : int
+    {
         try {
             if ($this->dbh->open()) {
                 $lastID = $this->dbh->open()->lastInsertId();
@@ -202,5 +218,33 @@ class DataMapper implements DataMapperInterface {
             throw $throwable;
         }
     }
-}
 
+    /**
+     * Returns the query condition merged with the query parameters
+     * 
+     * @param array $conditions
+     * @param array $parameters
+     * @return array
+     */
+    public function buildQueryParameters(array $conditions = [], array $parameters = []) : array
+    {
+        return (!empty($parameters) || (!empty($conditions)) ? array_merge($conditions, $parameters) : $parameters);
+    }
+
+    /**
+     * Persist queries to database
+     * 
+     * @param string $query
+     * @param array $parameters
+     * @return mixed
+     * @throws Throwable
+     */
+    public function persist(string $sqlQuery, array $parameters)
+    {
+        try {
+            return $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
+        } catch(Throwable $throwable){
+            throw $throwable;
+        }
+    }
+}

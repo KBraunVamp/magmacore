@@ -32,7 +32,7 @@ Interface DataMapperInterface {
     /**
      * 
      */
-  public function execute() : void;
+  public function execute();
 
     /**
      * 

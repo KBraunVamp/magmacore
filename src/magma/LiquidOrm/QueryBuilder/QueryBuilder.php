@@ -31,7 +31,7 @@ class QueryBuilder implements QueryBuilderInterface {
 
     ];
 
-    protected const QUERY_TYPES = ['insert', 'select', 'update', 'delete', 'raw'];
+    protected const QUERY_TYPES = ['insert', 'select', 'update', 'delete', 'search', 'raw'];
 
     /**
      * Main Constructor Class
@@ -82,6 +82,7 @@ class QueryBuilder implements QueryBuilderInterface {
     public function updateQuery() : string {
         if ($this->isQueryTypeValid('update')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
+                $values = '';
                 foreach ($this->key['fields'] as $field) {
                     if ($field !== $this->key['primary_key']) {
                         $values .= $field . "= :" . $field . ", ";
@@ -114,6 +115,18 @@ class QueryBuilder implements QueryBuilderInterface {
             return $this->sqlQuery;
         }
         return false; 
+    }
+
+    public function deleteQuery() : string {
+        return '';
+    }
+
+    public function searchQuery() : string {
+        return '';
+    }
+
+    public function rawQuery() : string {
+        return '';
     }
 
     private function hasConditions() {
