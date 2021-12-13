@@ -4,6 +4,7 @@ declare(strict_type=1);
 
 namespace Magma\LiquidOrm\QueryBuilder;
 
+use Magma\LiquidOrm\QueryBuilder\Exception\QueryBuilderException;
 use Magma\LiquidOrm\QueryBuilder\QueryBuilderInterface;
 
 class QueryBuilderFactory {
