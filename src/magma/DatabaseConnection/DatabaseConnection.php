@@ -5,6 +5,7 @@ declare(strict_type=1);
 namespace Magma\DatabaseConnection;
 
 use Magma\DatabaseConnection\Exception\DatabaseConnectionException;
+use PDOException;
 use PDO;
 
 class DatabaseConnection implements DatabaseConnectionInterface {

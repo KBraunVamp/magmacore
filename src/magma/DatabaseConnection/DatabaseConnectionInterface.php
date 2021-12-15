@@ -4,6 +4,8 @@ declare(strict_type=1);
 
 namespace Magma\DatabaseConnection;
 
+use PDO;
+
 Interface DatabaseConnectionInterface {
 
     /**
