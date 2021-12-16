@@ -6,7 +6,7 @@ namespace Magma\LiquidOrm\DataRepository;
 
 use Magma\LiquidOrm\DataRepository\Exception\DataRepositoryException;
 
-class DataReositoryFactory {
+class DataRepositoryFactory {
 
     protected string $tableSchema;
     
